@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 abstract final class SecureStorageKeys {
   static const String accessToken = 'access_token';
   static const String refreshToken = 'refresh_token';
+  static const String userData = 'user_data';
 }
 
 class SecureStorage {
@@ -27,10 +28,17 @@ class SecureStorage {
     ]);
   }
 
+  Future<String?> readUserData() =>
+      _storage.read(key: SecureStorageKeys.userData);
+
+  Future<void> saveUserData(String json) =>
+      _storage.write(key: SecureStorageKeys.userData, value: json);
+
   Future<void> clearTokens() async {
     await Future.wait([
       _storage.delete(key: SecureStorageKeys.accessToken),
       _storage.delete(key: SecureStorageKeys.refreshToken),
+      _storage.delete(key: SecureStorageKeys.userData),
     ]);
   }
 }

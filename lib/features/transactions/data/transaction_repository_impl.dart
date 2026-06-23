@@ -21,7 +21,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     if (cursor != null) queryParams['cursor'] = cursor;
     try {
       final response = await _dio.get<Map<String, dynamic>>(
-        '/accounts/$accountId/transactions',
+        'accounts/$accountId/transactions',
         queryParameters: queryParams,
       );
       return Success(TransactionPageDto.fromJson(response.data!));

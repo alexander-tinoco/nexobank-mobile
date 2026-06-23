@@ -16,7 +16,7 @@ class LoggingInterceptor extends Interceptor {
     if (kDebugMode) {
       final sanitizedHeaders = Map<String, dynamic>.from(options.headers)
         ..removeWhere((k, _) => _sensitiveHeaders.contains(k.toLowerCase()));
-      debugPrint('[DIO] → ${options.method} ${options.path}');
+      debugPrint('[DIO] → ${options.method} ${options.uri}');
       debugPrint('[DIO]   Headers: $sanitizedHeaders');
       if (options.data != null) {
         debugPrint('[DIO]   Body: ${_sanitizeData(options.data)}');
@@ -28,7 +28,7 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
     if (kDebugMode) {
-      debugPrint('[DIO] ← ${response.statusCode} ${response.requestOptions.path}');
+      debugPrint('[DIO] ← ${response.statusCode} ${response.requestOptions.uri}');
     }
     handler.next(response);
   }
@@ -37,7 +37,8 @@ class LoggingInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (kDebugMode) {
       debugPrint(
-        '[DIO] ✕ ${err.response?.statusCode} ${err.requestOptions.path}: ${err.message}',
+        '[DIO] ✕ ${err.type.name} ${err.response?.statusCode} '
+        '${err.requestOptions.uri}: ${err.message ?? err.error}',
       );
     }
     handler.next(err);

@@ -28,10 +28,10 @@ void main() {
   group('getCardsByAccount', () {
     test('calls GET /accounts/{id}/cards and returns list', () async {
       when(
-        () => mockDio.get<List<dynamic>>('/accounts/acc1/cards'),
+        () => mockDio.get<List<dynamic>>('accounts/acc1/cards'),
       ).thenAnswer(
         (_) async => Response<List<dynamic>>(
-          requestOptions: RequestOptions(path: '/accounts/acc1/cards'),
+          requestOptions: RequestOptions(path: 'accounts/acc1/cards'),
           statusCode: 200,
           data: [_fakeCardJson],
         ),
@@ -44,15 +44,15 @@ void main() {
       expect(cards.length, 1);
       expect(cards.first.id, 'card1');
       expect(cards.first.isFrozen, isFalse);
-      verify(() => mockDio.get<List<dynamic>>('/accounts/acc1/cards')).called(1);
+      verify(() => mockDio.get<List<dynamic>>('accounts/acc1/cards')).called(1);
     });
 
     test('returns Failure on DioException', () async {
       when(
-        () => mockDio.get<List<dynamic>>('/accounts/acc1/cards'),
+        () => mockDio.get<List<dynamic>>('accounts/acc1/cards'),
       ).thenThrow(
         DioException(
-          requestOptions: RequestOptions(path: '/accounts/acc1/cards'),
+          requestOptions: RequestOptions(path: 'accounts/acc1/cards'),
           type: DioExceptionType.connectionError,
         ),
       );
@@ -68,10 +68,10 @@ void main() {
         ..['status'] = 'frozen';
 
       when(
-        () => mockDio.patch<Map<String, dynamic>>('/cards/card1/freeze'),
+        () => mockDio.patch<Map<String, dynamic>>('cards/card1/freeze'),
       ).thenAnswer(
         (_) async => Response<Map<String, dynamic>>(
-          requestOptions: RequestOptions(path: '/cards/card1/freeze'),
+          requestOptions: RequestOptions(path: 'cards/card1/freeze'),
           statusCode: 200,
           data: frozenJson,
         ),
@@ -82,7 +82,7 @@ void main() {
       expect(result, isA<Success<CardModel>>());
       final card = (result as Success<CardModel>).value;
       expect(card.isFrozen, isTrue);
-      verify(() => mockDio.patch<Map<String, dynamic>>('/cards/card1/freeze'))
+      verify(() => mockDio.patch<Map<String, dynamic>>('cards/card1/freeze'))
           .called(1);
     });
   });

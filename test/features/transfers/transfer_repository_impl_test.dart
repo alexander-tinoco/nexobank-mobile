@@ -29,7 +29,7 @@ void main() {
   );
 
   final successResponse = Response<Map<String, dynamic>>(
-    requestOptions: RequestOptions(path: '/transfers'),
+    requestOptions: RequestOptions(path: 'transfers'),
     statusCode: 200,
     data: {
       'id': 'txn-1',
@@ -46,7 +46,7 @@ void main() {
     test('calls POST /transfers with correct idempotency_key', () async {
       when(
         () => mockDio.post<Map<String, dynamic>>(
-          '/transfers',
+          'transfers',
           data: any(named: 'data'),
         ),
       ).thenAnswer((_) async => successResponse);
@@ -55,7 +55,7 @@ void main() {
 
       final captured = verify(
         () => mockDio.post<Map<String, dynamic>>(
-          '/transfers',
+          'transfers',
           data: captureAny(named: 'data'),
         ),
       ).captured;
@@ -69,7 +69,7 @@ void main() {
     test('returns Success<Transfer> on 200', () async {
       when(
         () => mockDio.post<Map<String, dynamic>>(
-          '/transfers',
+          'transfers',
           data: any(named: 'data'),
         ),
       ).thenAnswer((_) async => successResponse);
@@ -84,12 +84,12 @@ void main() {
         () async {
       when(
         () => mockDio.post<Map<String, dynamic>>(
-          '/transfers',
+          'transfers',
           data: any(named: 'data'),
         ),
       ).thenThrow(
         DioException(
-          requestOptions: RequestOptions(path: '/transfers'),
+          requestOptions: RequestOptions(path: 'transfers'),
           error: const InsufficientFundsError(),
           type: DioExceptionType.badResponse,
         ),
@@ -104,12 +104,12 @@ void main() {
     test('returns Failure<NetworkError> on connection error', () async {
       when(
         () => mockDio.post<Map<String, dynamic>>(
-          '/transfers',
+          'transfers',
           data: any(named: 'data'),
         ),
       ).thenThrow(
         DioException(
-          requestOptions: RequestOptions(path: '/transfers'),
+          requestOptions: RequestOptions(path: 'transfers'),
           type: DioExceptionType.connectionError,
           message: 'No connection',
         ),

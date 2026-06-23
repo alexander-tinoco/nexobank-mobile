@@ -16,7 +16,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Result<List<Account>>> getAccounts() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>('/accounts');
+      final response = await _dio.get<Map<String, dynamic>>('accounts');
       final dto = AccountListDto.fromJson(response.data!);
       return Success(dto.toDomain());
     } on DioException catch (e) {
@@ -27,7 +27,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Result<Account>> getAccountById(String id) async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>('/accounts/$id');
+      final response = await _dio.get<Map<String, dynamic>>('accounts/$id');
       final dto = AccountDto.fromJson(response.data!);
       return Success(dto.toDomain());
     } on DioException catch (e) {

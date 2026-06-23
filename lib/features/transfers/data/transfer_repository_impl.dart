@@ -17,7 +17,7 @@ class TransferRepositoryImpl implements TransferRepository {
   Future<Result<Transfer>> executeTransfer(TransferRequestDto dto) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        '/transfers',
+        'transfers',
         data: dto.toJson(),
       );
       final transfer =

@@ -16,7 +16,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<Result<UserProfile>> getProfile() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>('/users/me');
+      final response = await _dio.get<Map<String, dynamic>>('users/me');
       final dto = UserDto.fromJson(response.data!);
       return Success(dto.toDomain());
     } on DioException catch (e) {
@@ -30,7 +30,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<Result<UserProfile>> updateProfile(UpdateProfileRequestDto dto) async {
     try {
       final response = await _dio.patch<Map<String, dynamic>>(
-        '/users/me',
+        'users/me',
         data: dto.toJson(),
       );
       final userDto = UserDto.fromJson(response.data!);

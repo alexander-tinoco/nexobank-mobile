@@ -14,7 +14,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
   Future<Result<void>> registerDeviceToken(String token) async {
     try {
       await _dio.post<void>(
-        '/device-tokens',
+        'device-tokens',
         data: <String, dynamic>{
           'token': token,
           'platform': _platform(),

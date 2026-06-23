@@ -37,7 +37,7 @@ class AuthInterceptor extends Interceptor {
     }
 
     // Avoid infinite loop on the refresh endpoint itself
-    if (err.requestOptions.path.contains('/auth/refresh')) {
+    if (err.requestOptions.path.contains('auth/refresh')) {
       await onLogout();
       handler.next(err);
       return;
@@ -60,7 +60,7 @@ class AuthInterceptor extends Interceptor {
       // Use a clean Dio instance to avoid re-triggering this interceptor
       final refreshDio = Dio(BaseOptions(baseUrl: dio.options.baseUrl));
       final response = await refreshDio.post<Map<String, dynamic>>(
-        '/auth/refresh',
+        'auth/refresh',
         data: {'refresh_token': refreshToken},
       );
 

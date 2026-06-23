@@ -62,8 +62,11 @@ class NotificationsNotifier extends AsyncNotifier<NotificationsState> {
     if (token == null) return;
 
     try {
-      final uri = Uri.parse('${AppConfig.wsUrl}/ws/notifications?token=$token');
+      // wsUrl already ends with '/'; do NOT add a leading slash to the path.
+      final uri = Uri.parse('${AppConfig.wsUrl}ws/notifications?token=$token');
       _channel = WebSocketChannel.connect(uri);
+      // Await handshake so upgrade failures are caught by the try/catch.
+      await _channel!.ready;
 
       _subscription = _channel!.stream.listen(
         _onMessage,

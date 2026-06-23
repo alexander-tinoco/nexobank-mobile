@@ -16,7 +16,7 @@ class CardRepositoryImpl implements CardRepository {
   Future<Result<List<CardModel>>> getCardsByAccount(String accountId) async {
     try {
       final response =
-          await _dio.get<List<dynamic>>('/accounts/$accountId/cards');
+          await _dio.get<List<dynamic>>('accounts/$accountId/cards');
       final cards = (response.data!)
           .map((e) => CardDto.fromJson(e as Map<String, dynamic>).toDomain())
           .toList();
@@ -34,7 +34,7 @@ class CardRepositoryImpl implements CardRepository {
   Future<Result<CardModel>> toggleFreeze(String cardId) async {
     try {
       final response =
-          await _dio.patch<Map<String, dynamic>>('/cards/$cardId/freeze');
+          await _dio.patch<Map<String, dynamic>>('cards/$cardId/freeze');
       final card = CardDto.fromJson(response.data!).toDomain();
       return Success(card);
     } on DioException catch (e) {

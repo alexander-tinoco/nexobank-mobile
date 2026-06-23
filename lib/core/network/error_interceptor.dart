@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nexobank_mobile/core/errors/app_error.dart';
 
 class ErrorInterceptor extends Interceptor {
@@ -22,6 +23,13 @@ class ErrorInterceptor extends Interceptor {
     final appError = _toAppError(err);
     if (appError is NetworkError) {
       onNetworkError?.call();
+    }
+    // Log here because reject() skips following interceptors (LoggingInterceptor).
+    if (kDebugMode) {
+      debugPrint(
+        '[DIO] ✕ ${err.type.name} ${err.response?.statusCode} '
+        '${err.requestOptions.uri}: $appError',
+      );
     }
     handler.reject(
       DioException(

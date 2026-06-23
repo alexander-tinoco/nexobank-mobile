@@ -23,7 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
   // After login/register the API returns only tokens.
   // We immediately fetch /users/me to hydrate the AuthUser.
   Future<AuthUser> _fetchCurrentUser() async {
-    final response = await dioClient.dio.get<Map<String, dynamic>>('/users/me');
+    final response = await dioClient.dio.get<Map<String, dynamic>>('users/me');
     final data = response.data!;
     return AuthUser(
       id: data['id'] as String,
@@ -39,7 +39,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       final response = await dioClient.dio.post<Map<String, dynamic>>(
-        '/auth/login',
+        'auth/login',
         data: LoginRequestDto(email: email, password: password).toJson(),
       );
       final dto = LoginResponseDto.fromJson(response.data!);
@@ -67,7 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       final response = await dioClient.dio.post<Map<String, dynamic>>(
-        '/auth/register',
+        'auth/register',
         data: RegisterRequestDto(
           name: name,
           email: email,
@@ -94,7 +94,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Result<void>> logout() async {
     try {
-      await dioClient.dio.post<void>('/auth/logout');
+      await dioClient.dio.post<void>('auth/logout');
       await secureStorage.clearTokens();
       return const Success(null);
     } on DioException catch (e) {
@@ -111,7 +111,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Result<void>> forgotPassword({required String email}) async {
     try {
       await dioClient.dio.post<void>(
-        '/auth/forgot-password',
+        'auth/forgot-password',
         data: {'email': email},
       );
       return const Success(null);
@@ -131,7 +131,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       await dioClient.dio.post<void>(
-        '/auth/reset-password',
+        'auth/reset-password',
         data: {'token': token, 'new_password': newPassword},
       );
       return const Success(null);

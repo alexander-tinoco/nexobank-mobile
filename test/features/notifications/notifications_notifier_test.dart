@@ -18,6 +18,10 @@ void main() {
     when(
       () => mockStorage.read(key: SecureStorageKeys.refreshToken),
     ).thenAnswer((_) async => null);
+    // authNotifier.build() also reads userData to restore the session.
+    when(
+      () => mockStorage.read(key: SecureStorageKeys.userData),
+    ).thenAnswer((_) async => null);
   });
 
   ProviderContainer makeContainer() => ProviderContainer(

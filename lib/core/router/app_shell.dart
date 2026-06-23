@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nexobank_mobile/core/router/app_router.dart';
 import 'package:nexobank_mobile/core/theme/app_colors.dart';
+import 'package:nexobank_mobile/core/widgets/offline_banner.dart';
 import 'package:nexobank_mobile/features/notifications/presentation/providers/notifications_notifier.dart';
 import 'package:nexobank_mobile/features/notifications/presentation/widgets/notification_badge_widget.dart';
 
@@ -22,7 +23,12 @@ class AppShell extends ConsumerWidget {
     );
 
     return Scaffold(
-      body: child,
+      body: Column(
+        children: [
+          const OfflineBanner(),
+          Expanded(child: child),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         backgroundColor: AppColors.primary,
         indicatorColor: AppColors.brandDeep,

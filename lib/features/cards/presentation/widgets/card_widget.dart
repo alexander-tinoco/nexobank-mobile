@@ -164,32 +164,35 @@ class _FreezeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.2),
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isFrozen ? Icons.lock_open : Icons.lock,
-              color: Colors.white,
-              size: 14,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              isFrozen ? 'Descongelar' : 'Congelar',
-              style: const TextStyle(
+    return Tooltip(
+      message: isFrozen ? 'Descongelar tarjeta' : 'Congelar tarjeta',
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.2),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isFrozen ? Icons.lock_open : Icons.lock,
                 color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+                size: 14,
               ),
-            ),
-          ],
+              const SizedBox(width: 4),
+              Text(
+                isFrozen ? 'Descongelar' : 'Congelar',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

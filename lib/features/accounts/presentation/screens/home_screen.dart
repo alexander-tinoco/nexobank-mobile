@@ -47,7 +47,17 @@ class HomeScreen extends ConsumerWidget {
         data: (accounts) {
           if (accounts.isEmpty) {
             return const Center(
-              child: Text('No tienes cuentas aún'),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.account_balance_outlined, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    'No tienes cuentas registradas aún',
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                ],
+              ),
             );
           }
           return RefreshIndicator(

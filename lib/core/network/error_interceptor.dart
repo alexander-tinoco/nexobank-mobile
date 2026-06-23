@@ -2,12 +2,31 @@ import 'package:dio/dio.dart';
 import 'package:nexobank_mobile/core/errors/app_error.dart';
 
 class ErrorInterceptor extends Interceptor {
+  const ErrorInterceptor({this.onNetworkError, this.onNetworkSuccess});
+
+  /// Called when a timeout or connection error is detected, so the UI can
+  /// show an offline banner.
+  final void Function()? onNetworkError;
+
+  /// Called on every successful response to dismiss the offline banner.
+  final void Function()? onNetworkSuccess;
+
+  @override
+  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+    onNetworkSuccess?.call();
+    handler.next(response);
+  }
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
+    final appError = _toAppError(err);
+    if (appError is NetworkError) {
+      onNetworkError?.call();
+    }
     handler.reject(
       DioException(
         requestOptions: err.requestOptions,
-        error: _toAppError(err),
+        error: appError,
         type: err.type,
         response: err.response,
       ),

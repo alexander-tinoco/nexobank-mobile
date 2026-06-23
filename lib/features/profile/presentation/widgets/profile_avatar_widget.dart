@@ -10,20 +10,23 @@ class ProfileAvatarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initials = _initials(name);
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        gradient: AppColors.brandGradient,
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: Text(
-          initials,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: size * 0.35,
-            fontWeight: FontWeight.bold,
+    return Semantics(
+      label: 'Avatar de $name',
+      child: Container(
+        width: size,
+        height: size,
+        decoration: const BoxDecoration(
+          gradient: AppColors.brandGradient,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Text(
+            initials,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: size * 0.35,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),

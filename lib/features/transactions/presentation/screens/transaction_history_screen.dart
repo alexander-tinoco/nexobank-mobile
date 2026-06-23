@@ -78,14 +78,26 @@ class _TransactionHistoryScreenState
       return const Center(child: Text('No hay transacciones aún.'));
     }
 
+    final footerCount = state.isLoadingMore || !state.hasMore ? 1 : 0;
     return ListView.builder(
       controller: _scrollController,
-      itemCount: state.transactions.length + (state.isLoadingMore ? 1 : 0),
+      itemCount: state.transactions.length + footerCount,
       itemBuilder: (context, index) {
         if (index == state.transactions.length) {
+          if (state.isLoadingMore) {
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
           return const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: CircularProgressIndicator()),
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: Text(
+                'Has llegado al final',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+            ),
           );
         }
         return Column(

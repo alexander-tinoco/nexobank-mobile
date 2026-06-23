@@ -3,7 +3,13 @@ import 'package:flutter/foundation.dart';
 
 class LoggingInterceptor extends Interceptor {
   static const _sensitiveHeaders = {'authorization', 'cookie'};
-  static const _sensitiveBodyFields = {'password', 'new_password', 'token', 'refresh_token'};
+  static const _sensitiveBodyFields = {
+    'password',
+    'new_password',
+    'token',
+    'refresh_token',
+    'card_number',
+  };
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {

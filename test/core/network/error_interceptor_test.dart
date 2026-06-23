@@ -7,7 +7,7 @@ void main() {
   late ErrorInterceptor sut;
 
   setUp(() {
-    sut = ErrorInterceptor();
+    sut = const ErrorInterceptor();
   });
 
   DioException makeError({

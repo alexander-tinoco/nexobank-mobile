@@ -6,11 +6,14 @@ import 'package:nexobank_mobile/core/network/error_interceptor.dart';
 import 'package:nexobank_mobile/core/network/logging_interceptor.dart';
 import 'package:nexobank_mobile/core/router/app_router.dart';
 import 'package:nexobank_mobile/core/storage/secure_storage.dart';
+import 'package:nexobank_mobile/core/widgets/offline_banner.dart';
 
 class DioClient {
   DioClient({
     required SecureStorage secureStorage,
     required Future<void> Function() onLogout,
+    void Function()? onNetworkError,
+    void Function()? onNetworkSuccess,
   }) {
     _dio = Dio(
       BaseOptions(
@@ -27,7 +30,10 @@ class DioClient {
         dio: _dio,
         onLogout: onLogout,
       ),
-      ErrorInterceptor(),
+      ErrorInterceptor(
+        onNetworkError: onNetworkError,
+        onNetworkSuccess: onNetworkSuccess,
+      ),
       LoggingInterceptor(),
     ]);
   }
@@ -47,5 +53,7 @@ final dioClientProvider = Provider<DioClient>((ref) {
       await secureStorage.clearTokens();
       authNotifier.onAuthStateChanged();
     },
+    onNetworkError: () => ref.read(offlineBannerProvider.notifier).state = true,
+    onNetworkSuccess: () => ref.read(offlineBannerProvider.notifier).state = false,
   );
 });

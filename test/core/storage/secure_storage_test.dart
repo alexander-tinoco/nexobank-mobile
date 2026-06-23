@@ -84,12 +84,15 @@ void main() {
   });
 
   group('clearTokens', () {
-    test('deletes both tokens', () async {
+    test('deletes all stored credentials', () async {
       when(
         () => mockPlugin.delete(key: SecureStorageKeys.accessToken),
       ).thenAnswer((_) async {});
       when(
         () => mockPlugin.delete(key: SecureStorageKeys.refreshToken),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockPlugin.delete(key: SecureStorageKeys.userData),
       ).thenAnswer((_) async {});
 
       await sut.clearTokens();
@@ -99,6 +102,9 @@ void main() {
       ).called(1);
       verify(
         () => mockPlugin.delete(key: SecureStorageKeys.refreshToken),
+      ).called(1);
+      verify(
+        () => mockPlugin.delete(key: SecureStorageKeys.userData),
       ).called(1);
     });
   });

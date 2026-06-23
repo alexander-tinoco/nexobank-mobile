@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nexobank_mobile/core/router/app_shell.dart';
 import 'package:nexobank_mobile/core/storage/secure_storage.dart';
+import 'package:nexobank_mobile/features/accounts/presentation/screens/account_detail_screen.dart';
+import 'package:nexobank_mobile/features/accounts/presentation/screens/home_screen.dart';
 import 'package:nexobank_mobile/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:nexobank_mobile/features/auth/presentation/screens/login_screen.dart';
 import 'package:nexobank_mobile/features/auth/presentation/screens/register_screen.dart';
 import 'package:nexobank_mobile/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:nexobank_mobile/features/auth/presentation/screens/splash_screen.dart';
+import 'package:nexobank_mobile/features/cards/presentation/screens/card_detail_screen.dart';
+import 'package:nexobank_mobile/features/notifications/presentation/screens/notification_center_screen.dart';
+import 'package:nexobank_mobile/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:nexobank_mobile/features/profile/presentation/screens/profile_screen.dart';
+import 'package:nexobank_mobile/features/transfers/presentation/screens/transfer_confirm_screen.dart';
+import 'package:nexobank_mobile/features/transfers/presentation/screens/transfer_form_screen.dart';
+import 'package:nexobank_mobile/features/transfers/presentation/screens/transfer_result_screen.dart';
 
 abstract final class AppRoutes {
   static const String splash = '/splash';
@@ -64,6 +74,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      // Unauthenticated routes
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
@@ -84,65 +95,59 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.resetPassword,
         builder: (context, state) => const ResetPasswordScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const _PlaceholderScreen(label: 'Home'),
-      ),
-      GoRoute(
-        path: AppRoutes.accountDetail,
-        builder: (context, state) =>
-            _PlaceholderScreen(label: 'Account ${state.pathParameters['id']}'),
-      ),
-      GoRoute(
-        path: AppRoutes.cardDetail,
-        builder: (context, state) =>
-            _PlaceholderScreen(label: 'Card ${state.pathParameters['id']}'),
-      ),
-      GoRoute(
-        path: AppRoutes.transfer,
-        builder: (context, state) =>
-            const _PlaceholderScreen(label: 'Transfer Form'),
-      ),
-      GoRoute(
-        path: AppRoutes.transferConfirm,
-        builder: (context, state) =>
-            const _PlaceholderScreen(label: 'Transfer Confirm'),
-      ),
-      GoRoute(
-        path: AppRoutes.transferResult,
-        builder: (context, state) =>
-            const _PlaceholderScreen(label: 'Transfer Result'),
-      ),
-      GoRoute(
-        path: AppRoutes.notifications,
-        builder: (context, state) =>
-            const _PlaceholderScreen(label: 'Notifications'),
-      ),
-      GoRoute(
-        path: AppRoutes.profile,
-        builder: (context, state) =>
-            const _PlaceholderScreen(label: 'Profile'),
-      ),
-      GoRoute(
-        path: AppRoutes.editProfile,
-        builder: (context, state) =>
-            const _PlaceholderScreen(label: 'Edit Profile'),
+
+      // Authenticated routes wrapped in AppShell (BottomNavigationBar)
+      ShellRoute(
+        builder: (context, state, child) => AppShell(child: child),
+        routes: [
+          GoRoute(
+            path: AppRoutes.home,
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.accountDetail,
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return AccountDetailScreen(accountId: id);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.cardDetail,
+            builder: (context, state) {
+              final cardId = state.pathParameters['id']!;
+              // accountId is passed as extra when navigating to this route
+              final accountId = (state.extra as String?) ?? '';
+              return CardDetailScreen(accountId: accountId, cardId: cardId);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.transfer,
+            builder: (context, state) => const TransferFormScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.transferConfirm,
+            builder: (context, state) => TransferConfirmScreen(
+              formData: state.extra! as TransferFormData,
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.transferResult,
+            builder: (context, state) => const TransferResultScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.notifications,
+            builder: (context, state) => const NotificationCenterScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.profile,
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.editProfile,
+            builder: (context, state) => const EditProfileScreen(),
+          ),
+        ],
       ),
     ],
   );
 });
-
-// Temporary screen builders. Feature agents replace these with real screens.
-class _PlaceholderScreen extends StatelessWidget {
-  const _PlaceholderScreen({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(label)),
-      body: Center(child: Text(label)),
-    );
-  }
-}

@@ -16,7 +16,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Result<List<Account>>> getAccounts() async {
     try {
-      final response = await _dio.get<List<dynamic>>('/accounts');
+      final response = await _dio.get<Map<String, dynamic>>('/accounts');
       final dto = AccountListDto.fromJson(response.data!);
       return Success(dto.toDomain());
     } on DioException catch (e) {

@@ -54,6 +54,10 @@ add_subdirectory(${FLUTTER_MANAGED_DIR})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
+# Workaround: snap Flutter ships an older linker that rejects newer GLib symbols
+# in libsecret-1.so at link time. They are resolved correctly at runtime.
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--allow-shlib-undefined")
+
 # Application build; see runner/CMakeLists.txt.
 add_subdirectory("runner")
 

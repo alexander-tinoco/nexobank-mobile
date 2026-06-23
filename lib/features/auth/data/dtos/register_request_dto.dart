@@ -10,7 +10,7 @@ class RegisterRequestDto {
   final String password;
 
   Map<String, dynamic> toJson() => {
-        'name': name,
+        'full_name': name,
         'email': email,
         'password': password,
       };

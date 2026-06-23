@@ -19,14 +19,16 @@ class MockDioClient extends Mock implements DioClient {
 
 class MockSecureStorage extends Mock implements SecureStorage {}
 
-const _loginResponseJson = <String, dynamic>{
+// API now returns only tokens — user data fetched via GET /users/me
+const _tokenResponseJson = <String, dynamic>{
   'access_token': 'access_abc',
   'refresh_token': 'refresh_xyz',
-  'user': <String, dynamic>{
-    'id': 'user-1',
-    'name': 'Jane Doe',
-    'email': 'jane@test.com',
-  },
+};
+
+const _meResponseJson = <String, dynamic>{
+  'id': 'user-1',
+  'full_name': 'Jane Doe',
+  'email': 'jane@test.com',
 };
 
 void main() {
@@ -46,8 +48,28 @@ void main() {
     registerFallbackValue(RequestOptions(path: ''));
   });
 
+  void stubSaveTokens() {
+    when(
+      () => mockStorage.saveTokens(
+        accessToken: any(named: 'accessToken'),
+        refreshToken: any(named: 'refreshToken'),
+      ),
+    ).thenAnswer((_) async {});
+    when(() => mockStorage.saveUserData(any())).thenAnswer((_) async {});
+  }
+
+  void stubMeEndpoint() {
+    when(() => mockDio.get<Map<String, dynamic>>(any())).thenAnswer(
+      (_) async => Response(
+        requestOptions: RequestOptions(path: '/users/me'),
+        statusCode: 200,
+        data: _meResponseJson,
+      ),
+    );
+  }
+
   group('login', () {
-    test('exitoso: guarda tokens y devuelve AuthUser', () async {
+    test('exitoso: guarda tokens, llama /users/me y devuelve AuthUser', () async {
       when(
         () => mockDio.post<Map<String, dynamic>>(
           any(),
@@ -57,18 +79,11 @@ void main() {
         (_) async => Response(
           requestOptions: RequestOptions(path: '/auth/login'),
           statusCode: 200,
-          data: _loginResponseJson,
+          data: _tokenResponseJson,
         ),
       );
-      when(
-        () => mockStorage.saveTokens(
-          accessToken: any(named: 'accessToken'),
-          refreshToken: any(named: 'refreshToken'),
-        ),
-      ).thenAnswer((_) async {});
-      when(
-        () => mockStorage.saveUserData(any()),
-      ).thenAnswer((_) async {});
+      stubMeEndpoint();
+      stubSaveTokens();
 
       final result = await sut.login(
         email: 'jane@test.com',
@@ -78,6 +93,7 @@ void main() {
       expect(result, isA<Success<dynamic>>());
       final user = (result as Success).value;
       expect(user.id, 'user-1');
+      expect(user.name, 'Jane Doe');
       expect(user.email, 'jane@test.com');
 
       verify(
@@ -86,6 +102,8 @@ void main() {
           refreshToken: 'refresh_xyz',
         ),
       ).called(1);
+      verify(() => mockStorage.saveUserData(any())).called(1);
+      verify(() => mockDio.get<Map<String, dynamic>>(any())).called(1);
     });
 
     test('POST falla con DioException → devuelve Failure con AppError', () async {
@@ -106,6 +124,36 @@ void main() {
 
       expect(result, isA<Failure<dynamic>>());
       expect((result as Failure).error, isA<UnauthorizedError>());
+    });
+  });
+
+  group('register', () {
+    test('exitoso: guarda tokens, llama /users/me y devuelve AuthUser', () async {
+      when(
+        () => mockDio.post<Map<String, dynamic>>(
+          any(),
+          data: any(named: 'data'),
+        ),
+      ).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(path: '/auth/register'),
+          statusCode: 201,
+          data: _tokenResponseJson,
+        ),
+      );
+      stubMeEndpoint();
+      stubSaveTokens();
+
+      final result = await sut.register(
+        name: 'Jane Doe',
+        email: 'jane@test.com',
+        password: 'secret123',
+      );
+
+      expect(result, isA<Success<dynamic>>());
+      final user = (result as Success).value;
+      expect(user.id, 'user-1');
+      expect(user.email, 'jane@test.com');
     });
   });
 

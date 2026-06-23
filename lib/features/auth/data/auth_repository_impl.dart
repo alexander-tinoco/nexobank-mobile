@@ -20,6 +20,18 @@ class AuthRepositoryImpl implements AuthRepository {
   final DioClient dioClient;
   final SecureStorage secureStorage;
 
+  // After login/register the API returns only tokens.
+  // We immediately fetch /users/me to hydrate the AuthUser.
+  Future<AuthUser> _fetchCurrentUser() async {
+    final response = await dioClient.dio.get<Map<String, dynamic>>('/users/me');
+    final data = response.data!;
+    return AuthUser(
+      id: data['id'] as String,
+      name: data['full_name'] as String,
+      email: data['email'] as String,
+    );
+  }
+
   @override
   Future<Result<AuthUser>> login({
     required String email,
@@ -31,17 +43,19 @@ class AuthRepositoryImpl implements AuthRepository {
         data: LoginRequestDto(email: email, password: password).toJson(),
       );
       final dto = LoginResponseDto.fromJson(response.data!);
-      final user = dto.user.toDomain();
-      await Future.wait([
-        secureStorage.saveTokens(
-          accessToken: dto.accessToken,
-          refreshToken: dto.refreshToken,
-        ),
-        secureStorage.saveUserData(user.toJsonString()),
-      ]);
+      await secureStorage.saveTokens(
+        accessToken: dto.accessToken,
+        refreshToken: dto.refreshToken,
+      );
+      final user = await _fetchCurrentUser();
+      await secureStorage.saveUserData(user.toJsonString());
       return Success(user);
     } on DioException catch (e) {
-      return Failure(e.error is AppError ? e.error as AppError : UnknownError('UNKNOWN', e.message ?? ''));
+      return Failure(
+        e.error is AppError
+            ? e.error as AppError
+            : UnknownError('UNKNOWN', e.message ?? ''),
+      );
     }
   }
 
@@ -54,20 +68,26 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await dioClient.dio.post<Map<String, dynamic>>(
         '/auth/register',
-        data: RegisterRequestDto(name: name, email: email, password: password).toJson(),
+        data: RegisterRequestDto(
+          name: name,
+          email: email,
+          password: password,
+        ).toJson(),
       );
       final dto = RegisterResponseDto.fromJson(response.data!);
-      final user = dto.authUser;
-      await Future.wait([
-        secureStorage.saveTokens(
-          accessToken: dto.accessToken,
-          refreshToken: dto.refreshToken,
-        ),
-        secureStorage.saveUserData(user.toJsonString()),
-      ]);
+      await secureStorage.saveTokens(
+        accessToken: dto.accessToken,
+        refreshToken: dto.refreshToken,
+      );
+      final user = await _fetchCurrentUser();
+      await secureStorage.saveUserData(user.toJsonString());
       return Success(user);
     } on DioException catch (e) {
-      return Failure(e.error is AppError ? e.error as AppError : UnknownError('UNKNOWN', e.message ?? ''));
+      return Failure(
+        e.error is AppError
+            ? e.error as AppError
+            : UnknownError('UNKNOWN', e.message ?? ''),
+      );
     }
   }
 
@@ -78,9 +98,12 @@ class AuthRepositoryImpl implements AuthRepository {
       await secureStorage.clearTokens();
       return const Success(null);
     } on DioException catch (e) {
-      // Clear tokens even if the server call fails
       await secureStorage.clearTokens();
-      return Failure(e.error is AppError ? e.error as AppError : UnknownError('UNKNOWN', e.message ?? ''));
+      return Failure(
+        e.error is AppError
+            ? e.error as AppError
+            : UnknownError('UNKNOWN', e.message ?? ''),
+      );
     }
   }
 
@@ -93,7 +116,11 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return const Success(null);
     } on DioException catch (e) {
-      return Failure(e.error is AppError ? e.error as AppError : UnknownError('UNKNOWN', e.message ?? ''));
+      return Failure(
+        e.error is AppError
+            ? e.error as AppError
+            : UnknownError('UNKNOWN', e.message ?? ''),
+      );
     }
   }
 
@@ -109,7 +136,11 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return const Success(null);
     } on DioException catch (e) {
-      return Failure(e.error is AppError ? e.error as AppError : UnknownError('UNKNOWN', e.message ?? ''));
+      return Failure(
+        e.error is AppError
+            ? e.error as AppError
+            : UnknownError('UNKNOWN', e.message ?? ''),
+      );
     }
   }
 }

@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "NexoBank – Linux (localhost)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=API_BASE_URL=http://localhost:8000/api/v1",
+        "--dart-define=WS_BASE_URL=ws://localhost:8000/api/v1",
+        "--dart-define=ENVIRONMENT=development"
+      ]
+    },
+    {
+      "name": "NexoBank – Android Emulator",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=API_BASE_URL=http://10.0.2.2:8000/api/v1",
+        "--dart-define=WS_BASE_URL=ws://10.0.2.2:8000/api/v1",
+        "--dart-define=ENVIRONMENT=development"
+      ]
+    },
+    {
+      "name": "NexoBank – iOS Simulator / macOS",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=API_BASE_URL=http://localhost:8000/api/v1",
+        "--dart-define=WS_BASE_URL=ws://localhost:8000/api/v1",
+        "--dart-define=ENVIRONMENT=development"
+      ]
+    }
+  ]
+}

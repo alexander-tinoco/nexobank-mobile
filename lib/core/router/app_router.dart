@@ -65,7 +65,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final isPublicRoute = _publicRoutes.contains(location);
 
-      if (!isAuthenticated && !isPublicRoute && location != AppRoutes.splash) {
+      // Splash is a transient entry point — always redirect to the right screen.
+      if (location == AppRoutes.splash) {
+        return isAuthenticated ? AppRoutes.home : AppRoutes.login;
+      }
+      if (!isAuthenticated && !isPublicRoute) {
         return AppRoutes.login;
       }
       if (isAuthenticated && isPublicRoute) {

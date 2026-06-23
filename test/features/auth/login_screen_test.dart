@@ -4,11 +4,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nexobank_mobile/core/errors/app_error.dart';
 import 'package:nexobank_mobile/core/router/app_router.dart';
+import 'package:nexobank_mobile/features/auth/domain/models/auth_user.dart';
 import 'package:nexobank_mobile/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:nexobank_mobile/features/auth/presentation/screens/login_screen.dart';
 import 'package:nexobank_mobile/features/auth/presentation/widgets/nexo_primary_button.dart';
 
 class FakeAuthNotifier extends AuthNotifier {
+  // build() is overridden so the widget test doesn't call secureStorageProvider
+  // (FlutterSecureStorage has no platform channel in the test environment).
+  @override
+  Future<AuthUser?> build() async => null;
+
   void setError(Object err) {
     state = AsyncError(err, StackTrace.current);
   }

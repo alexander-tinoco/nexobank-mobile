@@ -7,21 +7,14 @@ import 'package:nexobank_mobile/features/auth/domain/models/auth_user.dart';
 
 class AuthNotifier extends AsyncNotifier<AuthUser?> {
   @override
-  Future<AuthUser?> build() async => null;
-
-  Future<void> checkSession() async {
-    state = const AsyncLoading();
+  Future<AuthUser?> build() async {
+    // Auto-restore session from secure storage on first access.
+    // The router redirect handles navigation; this just populates the user state.
     final storage = ref.read(secureStorageProvider);
     final token = await storage.readAccessToken();
-    if (token == null || token.isEmpty) {
-      state = const AsyncData(null);
-      ref.read(routerAuthNotifierProvider).onAuthStateChanged();
-      return;
-    }
+    if (token == null || token.isEmpty) return null;
     final userJson = await storage.readUserData();
-    final user = AuthUser.fromJsonString(userJson);
-    state = AsyncData(user);
-    ref.read(routerAuthNotifierProvider).onAuthStateChanged();
+    return AuthUser.fromJsonString(userJson);
   }
 
   Future<void> login({required String email, required String password}) async {

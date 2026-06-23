@@ -43,14 +43,44 @@ void main() {
   }
 
   group('AuthNotifier', () {
-    test('initial state is AsyncData(null)', () async {
+    test('build: sin token devuelve null', () async {
+      when(() => mockStorage.readAccessToken()).thenAnswer((_) async => null);
+
       final container = makeContainer();
       addTearDown(container.dispose);
+
+      final state = await container.read(authNotifierProvider.future);
+      expect(state, isNull);
+    });
+
+    test('build: con token y userData restaura la sesión', () async {
+      when(() => mockStorage.readAccessToken())
+          .thenAnswer((_) async => 'valid_token');
+      when(() => mockStorage.readUserData())
+          .thenAnswer((_) async => _testUser.toJsonString());
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+
+      final state = await container.read(authNotifierProvider.future);
+      expect(state?.id, '1');
+      expect(state?.email, 'test@test.com');
+    });
+
+    test('build: token presente pero userData null devuelve null', () async {
+      when(() => mockStorage.readAccessToken())
+          .thenAnswer((_) async => 'valid_token');
+      when(() => mockStorage.readUserData()).thenAnswer((_) async => null);
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+
       final state = await container.read(authNotifierProvider.future);
       expect(state, isNull);
     });
 
     test('login exitoso actualiza estado a AuthUser', () async {
+      when(() => mockStorage.readAccessToken()).thenAnswer((_) async => null);
       when(
         () => mockRepo.login(
           email: any(named: 'email'),
@@ -72,6 +102,7 @@ void main() {
 
     test('login con credenciales inválidas produce AsyncError con UnauthorizedError',
         () async {
+      when(() => mockStorage.readAccessToken()).thenAnswer((_) async => null);
       when(
         () => mockRepo.login(
           email: any(named: 'email'),
@@ -92,7 +123,7 @@ void main() {
     });
 
     test('logout limpia el estado a null', () async {
-      // Set up logged-in state first
+      when(() => mockStorage.readAccessToken()).thenAnswer((_) async => null);
       when(
         () => mockRepo.login(
           email: any(named: 'email'),
@@ -111,33 +142,6 @@ void main() {
       expect(container.read(authNotifierProvider).value, _testUser);
 
       await container.read(authNotifierProvider.notifier).logout();
-
-      expect(container.read(authNotifierProvider).value, isNull);
-    });
-
-    test('checkSession con token válido y userData carga el usuario', () async {
-      when(() => mockStorage.readAccessToken())
-          .thenAnswer((_) async => 'valid_token');
-      when(() => mockStorage.readUserData())
-          .thenAnswer((_) async => _testUser.toJsonString());
-
-      final container = makeContainer();
-      addTearDown(container.dispose);
-
-      await container.read(authNotifierProvider.notifier).checkSession();
-
-      final state = container.read(authNotifierProvider);
-      expect(state.value?.id, '1');
-      expect(state.value?.email, 'test@test.com');
-    });
-
-    test('checkSession sin token emite null', () async {
-      when(() => mockStorage.readAccessToken()).thenAnswer((_) async => null);
-
-      final container = makeContainer();
-      addTearDown(container.dispose);
-
-      await container.read(authNotifierProvider.notifier).checkSession();
 
       expect(container.read(authNotifierProvider).value, isNull);
     });
